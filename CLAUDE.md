@@ -25,13 +25,13 @@
 |------|---------|---------------------|
 | 新功能 | Scope → Plan → Specs → Design → Tasks → Build → Ship | `os-scope` → `os-plan` → `os-spec` → `os-design` → `os-build` → `os-ship` |
 | API 契约变更 | Scope → Plan → Specs → Design → Tasks → Build → Ship | `os-scope` → `os-plan` → `os-spec` → `os-design` → `os-build` → `os-ship` |
-| Bug 修复 | Trace →（如需 Specs）→ Design → Tasks → Build → Ship | `os-trace` →（如需 `os-spec`）→ `os-design` → `os-build` → `os-ship` |
+| Bug 修复 | Trace → Specs → Design → Tasks → Build → Ship | `os-trace` → `os-spec` → `os-design` → `os-build` → `os-ship` |
 | 重构（≥3 文件或 >50 行逻辑变更） | Fork（可选）→ Plan → Specs → Design → Tasks → Build → Ship | `os-fork`（可选）→ `os-plan` → `os-spec` → `os-design` → `os-build` → `os-ship` |
 | 重构（≤2 文件且 ≤50 行逻辑变更） | 直接 REFACTOR，不建 change | （不调用） |
 | 样式/UI 统一修改 | Specs → Design → Tasks → Build → Ship | `os-spec` → `os-design` → `os-build` → `os-ship` |
 | 性能优化（不改行为） | Specs → Design → Tasks → Build → Ship（delta 写"MODIFIED: 性能约束"） | `os-spec` → `os-design` → `os-build` → `os-ship` |
 | 依赖升级（patch） | `[FAST-PATH]` | （不调用） |
-| 依赖升级（major/breaking） | Plan → Specs → Design → Tasks → Build → Ship | `os-plan` → `os-spec` → `os-design` → `os-build` → `os-ship` |
+| 依赖升级（major/breaking） | Scope → Plan → Specs → Design → Tasks → Build → Ship | `os-scope` → `os-plan` → `os-spec` → `os-design` → `os-build` → `os-ship` |
 | 格式/注释修正 | `[FAST-PATH]` | （不调用） |
 | 微小修复（≤5 行总 diff，无新增方法/类/导入） | `[FAST-PATH]` | （不调用） |
 | 探索讨论 | 仅讨论，不写代码，不进 propose。发现异常即转 Bug 修复 | （不调用） |
@@ -68,6 +68,7 @@
 8. **Skill 返回后必须按其指示执行** — 不得自行决定跳过或合并后续阶段
 9. **严禁事后补票** — 跳过流程直接写代码后，不要事后补写 proposal/specs/design/tasks。向用户说明违规并询问如何处理
 10. **动手前先跑基线** — 接到变更请求，先运行项目测试套件确认全绿。查找测试命令的优先级：`package.json` 的 `test` 脚本 → `Makefile` 的 `test` target → `pytest`/`go test ./...`/`cargo test` 等语言标准命令。基线有失败→先报告，不继续。项目无测试→跳过基线检查并在 tasks 中优先搭建测试基础设施
+11. **提供选项时使用 AskUserQuestion 工具** — 当需要用户在多个选项中做决定时（方案对比、需求澄清、技术选型、冲突解决），必须调用 `AskUserQuestion` 工具让用户点选，禁止让用户手动打字回复。单选用 `multiSelect: false`，多选用 `multiSelect: true`。每个选项含 label（≤12 字）和 description（≤30 字）。涉及代码视觉对比时用 `preview` 字段并列展示差异
 
 **转向规则：** 判定表中标注"（不调用）"的事项不调用任何 os-* skill。但探索讨论中若 Read 过程发现可观测异常 → 立即输出 `[WORKFLOW]` header 更正为 Bug 修复 → 调用 `os-trace`。
 
@@ -84,7 +85,9 @@
 | Scope | `os-scope` | 场景三问已回答；多子系统影响已识别；需求边界已明确 |
 | Plan | `os-plan` | 至少 2 个方案已对比；YAGNI 审查已通过；用户已分段确认 |
 | Specs | `os-spec` | Delta spec 已编写；GIVEN/WHEN/THEN Scenario ≥1 个；用户已确认 spec |
-| Design | `os-design` | 技术方案已定；测试策略已定；Spec→测试映射已完成；tasks.md 含 blockedBy 依赖 |
+| Design | `os-design` | 技术方案已定；测试策略已定；Spec→测试映射已完成；tasks.md 含 blockedBy 依赖 + 并行策略 |
+| Trace | `os-trace` | 四阶段根因分析完成；数据流断点已定位；修复前 spec 已编写 |
+| Fork | `os-fork` | Worktree 已创建；依赖已安装；基线全绿
 
 **`os-fork` 时机：** 多模块变更或高风险时，在 os-plan/os-trace 之后、os-design 之前启用，创建独立 Git Worktree 工作区。
 

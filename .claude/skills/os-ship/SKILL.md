@@ -20,7 +20,7 @@ description: OpenSpec 归档阶段——合并 delta spec、运行全量测试�
 3. 将变更目录移入 changes/archive/YYYY-MM-DD-<name>/
 ```
 
-**任一测试失败则停止归档** → 诊断根因后路由到对应阶段修复（spec 错误 → os-spec；design 问题 → os-design；代码 bug → os-build）。
+**任一测试失败则停止归档** → 调用 `os-trace` 诊断根因 → 根据诊断结果路由到对应阶段修复（spec 错误 → `os-spec`；design 问题 → `os-design`；代码 bug → `os-build`）。
 
 ## 完成后
 

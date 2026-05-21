@@ -43,7 +43,7 @@ description: OpenSpec 提案阶段——方案设计、多方案对比、YAGNI �
 
 ## 分段确认
 
-先展示 Intent + Scope，用户确认后再展示 Approaches，确认推荐方案后再展开详细 Approach。不要一次性展示完整 proposal。
+先展示 Intent + Scope，用户确认后再展示 Approaches。展示方案对比时使用 `AskUserQuestion` 工具，将 2-3 个方案作为选项，`preview` 字段并列展示各方案的代码/架构差异，让用户一键选择推荐方案。确认推荐方案后再展开详细 Approach。不要一次性展示完整 proposal。
 
 ## 自检清单（展示给用户前）
 
@@ -64,17 +64,12 @@ description: OpenSpec 提案阶段——方案设计、多方案对比、YAGNI �
 
 **用户：** "添加密码重置功能，可以通过邮箱发送重置链接"
 
-**模型：**
+**模型（第一轮 — Intent + Scope）：**
 ```
 [WORKFLOW] 判定表情况: 新功能 → 需求澄清 → propose → specs → design → tasks → TDD → archive
-[WORKFLOW] 当前阶段: Propose
-[WORKFLOW] 前置条件: 基线测试待确认
-
-先跑基线测试确认当前全部通过：
-> npm test
-✓ 12 passed, 0 failed
-
-### 第一步：Proposal
+[WORKFLOW] 当前阶段: Propose（分段确认第 1 步）
+[WORKFLOW] 前置条件: 基线测试已通过（12 passed, 0 failed）
+[WORKFLOW] 应调用 skill: os-plan
 
 先展示 Intent + Scope，确认后再展开方案。
 
@@ -90,29 +85,29 @@ description: OpenSpec 提案阶段——方案设计、多方案对比、YAGNI �
 请先确认以上范围和意图是否准确。确认后我展开备选方案。
 ```
 
-**用户：** "确认"
+**用户确认**
 
-**模型：**
+**模型（第二轮 — 方案对比，使用 AskUserQuestion）：**
 ```
-[WORKFLOW] 判定表情况: 新功能 → 当前仍处于 Propose 阶段（展开备选方案）
+[WORKFLOW] 判定表情况: 新功能 → Propose（分段确认第 2 步）
 [WORKFLOW] 当前阶段: Propose
 [WORKFLOW] 前置条件: Intent + Scope 已获用户确认
 
-## Approaches Considered
+（调用 AskUserQuestion，header="存储方案"，multiSelect: false，
+ 选项 A: label="内存存储" description="crypto随机hex + SHA-256哈希存入ConcurrentHashMap",
+       preview="优点: 零依赖，实现简单\n缺点: 服务重启丢失所有token"
+ 选项 B: label="数据库存储" description="JWT自包含过期 + 数据库记录token状态",
+       preview="优点: 持久化，可审计\n缺点: 需新建表+Flyway迁移"
+ 推荐: 方案A）
+```
 
-### 方案 A: 内存存储 token
-- token: crypto.randomBytes(32) → hex，SHA-256 hash 存入内存 Map
-- 有效期: 30 分钟，过期自动清理
-- 优点: 零依赖，实现简单
-- 缺点: 服务重启丢失所有 token；多实例不共享
+**用户点选方案 A**
 
-### 方案 B: 数据库存储 token
-- token: JWT（自包含过期时间），数据库记录 token 状态
-- 优点: 持久化，多实例共享，可审计
-- 缺点: 增加 DB 查询，需新建表 + Flyway 迁移
-
-### 推荐: 方案 A（当前阶段）
-原因：用户规模小，单实例部署，服务重启频率低。后续需要多实例时再迁移到方案 B。
+**模型（第三轮 — 完整 proposal）：**
+```
+[WORKFLOW] 判定表情况: 新功能 → Propose（分段确认第 3 步）
+[WORKFLOW] 当前阶段: Propose
+[WORKFLOW] 前置条件: 方案 A 已获用户确认
 
 ## Approach
 使用 crypto.randomBytes(32).toString('hex') 生成 64 位 hex token，SHA-256 哈希后存入 ConcurrentHashMap，ScheduledExecutorService 每 5 分钟清理过期条目。
