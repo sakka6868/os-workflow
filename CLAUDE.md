@@ -95,7 +95,7 @@
 | Specs | `os-spec` | Delta spec 已编写；GIVEN/WHEN/THEN Scenario ≥1 个；用户已确认 spec |
 | Design | `os-design`（UI 工作按指令调用 `os-ui` Phase 1） | 技术方案已定；测试策略已定；Spec→测试映射已完成；tasks.md 含 blockedBy 依赖 + 并行策略；UI 项目设计含 `os-ui` Phase 1 输出参考 |
 | Trace | `os-trace` | 四阶段根因分析完成；数据流断点已定位；修复前 spec 已编写 |
-| Fork | `os-fork` | Worktree 已创建；依赖已安装；基线全绿
+| Fork | `os-fork` | Worktree 已创建；依赖已安装；基线全绿 |
 
 **`os-fork` 时机：** 多模块变更或高风险时，在 os-plan/os-trace 之后、os-design 之前启用，创建独立 Git Worktree 工作区。
 
