@@ -76,7 +76,7 @@
 8. **Skill 返回后必须按其指示执行** — 不得自行决定跳过或合并后续阶段
 9. **严禁事后补票** — 跳过流程直接写代码后，不要事后补写 proposal/specs/design/tasks。向用户说明违规并询问如何处理
 10. **动手前先跑基线** — 接到变更请求，先运行项目测试套件确认全绿。查找测试命令的优先级：`package.json` 的 `test` 脚本 → `Makefile` 的 `test` target → `pytest`/`go test ./...`/`cargo test` 等语言标准命令。基线有失败→先报告，不继续。项目无测试→跳过基线检查并在 tasks 中优先搭建测试基础设施
-11. **提供选项时使用 AskUserQuestion 工具** — 当需要用户在多个选项中做决定时（方案对比、需求澄清、技术选型、冲突解决），必须调用 `AskUserQuestion` 工具让用户点选，禁止让用户手动打字回复。单选用 `multiSelect: false`，多选用 `multiSelect: true`。每个选项含 label（≤12 字）和 description（≤30 字）。涉及代码视觉对比时用 `preview` 字段并列展示差异
+11. **提供选项时使用 AskUserQuestion 工具** — 当需要用户在多个选项中做决定时（方案对比、需求澄清、技术选型、冲突解决、阶段确认），必须调用 `AskUserQuestion` 工具让用户点选，禁止让用户手动打字回复。单选用 `multiSelect: false`，多选用 `multiSelect: true`。每个选项含 label（≤12 字）和 description（≤30 字）。涉及代码视觉对比时用 `preview` 字段并列展示差异
 
 **转向规则：** 判定表中标注"（不调用）"的事项不调用任何 os-* skill。但探索讨论中若 Read 过程发现可观测异常 → 立即输出 `[WORKFLOW]` header 更正为 Bug 修复 → 调用 `os-trace`。
 
